@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "cleber",
+            "includePath": [
+                "${workspaceFolder}/engines",
+                "${workspaceFolder}/engines/sol"
+            ]
+        }
+    ],
+    "version": 4
+}
