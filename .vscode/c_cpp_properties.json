@@ -4,8 +4,10 @@
             "name": "cleber",
             "includePath": [
                 "${workspaceFolder}/engines",
-                "${workspaceFolder}/engines/sol"
-            ]
+                "${workspaceFolder}/engines/sol",
+                "${workspaceFolder}/out/gmp"
+            ],
+            "cppStandard": "c++23"
         }
     ],
     "version": 4
