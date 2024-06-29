@@ -23,8 +23,23 @@ namespace sol {
         static Value NewNull();
         void MakeNotPersistent();
         void MakePersistent();
-        static Value NewString(vec16 val);
+        static Value NewString(BaseString val);
+        static Value NewSymbol();
+        static Value NewSymbolWithDescription(BaseString desc);
+        bool IsPersistent();
+        bool IsUndefined();
+        bool IsNull();
+        bool IsString();
+        bool IsSymbol();
+        Maybe<BaseString> StringGetValue();
+        Maybe<NullType> StringSetValue(BaseString val);
+        Maybe<vec8> StringGetUtf8Value();
+        Maybe<NullType> StringSetUtf8Value(vec8 val);
+        Maybe<bool> SymbolHasDescription();
+        Maybe<BaseString> SymbolGetDescription();
+        Maybe<NullType> SymbolSetDescription(BaseString desc);
     };
+    struct NullType {};
     void Init();
     void Teardown();
     struct Thread {
@@ -51,8 +66,27 @@ namespace sol {
     vec8 cstringToVec8(char* cstr);
     bool vec8Compare(vec8 v1, vec8 v2);
     std::string vec8ToStdString(vec8 v);
-    vec16 utf8To16(vec8 val);
-    vec8 utf16To8(vec16 val);
+    struct BaseString {
+        vec16 chars;
+        std::vector<std::size_t> litchars;
+    };
+    BaseString utf8ToString(vec8 val);
+    vec8 stringToUtf8(BaseString val);
+    enum Error {
+        ErrorNoError,
+        ErrorWrongType,
+        ErrorNotFound
+    };
+    template<typename T>
+    struct Maybe {
+        Error err;
+        T val;
+        static Maybe<T> FromNoError(T v);
+        static Maybe<T> FromError(Error e);
+        bool IsError();
+        T ToNoError();
+        Error GetError();
+    };
 }
 
 #define SOL_MUNLOCKRET(m, ret) m.unlock(); return ret;
