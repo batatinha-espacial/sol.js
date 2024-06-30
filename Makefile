@@ -22,7 +22,7 @@
 #	OS_TARGET := macos_all
 #endif
 
-all:
+deps:
 	mkdir -p out/gmp
 	cd out/gmp ; ../../libs/gmp/configure
 	$(MAKE) -C out/gmp
