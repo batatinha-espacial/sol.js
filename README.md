@@ -4,4 +4,4 @@ Sol.js is a JS Runtime with its own Engine. Currently, we are at the beginning o
 
 # Update
 
-We are now open for contributions. For gaining contribution access, just DM the dicord user `antonio_breno` with the message `I want to contribute to Sol.js` and you may gain contribution access depending on your habilities and knowledge.
+We are now open for contributions. For gaining contribution access, just DM the Discord user `antonio_breno` with the message `I want to contribute to Sol.js` and you may gain contribution access depending on your habilities and knowledge.
