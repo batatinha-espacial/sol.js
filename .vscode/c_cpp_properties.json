@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "cleber",
+            "name": "sol",
             "includePath": [
                 "${workspaceFolder}/engines",
                 "${workspaceFolder}/engines/sol",
