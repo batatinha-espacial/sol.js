@@ -53,6 +53,45 @@ namespace sol {
     std::mutex sym_m;
 }
 
+std::function<sol::Value()> mknew(std::function<sol::BaseValue*()> fn) {
+    return [fn](){
+        sol::gc::gc_m.lock();
+        sol::BaseValue* val = fn();
+        sol::Value res;
+        res._ = val;
+        sol::gc::all.push_back(val);
+        sol::gc::persistent.push_back(val);
+        sol::gc::refs[val] = std::vector<void*>();
+        SOL_MUNLOCKRET(sol::gc::gc_m, res)
+    };
+}
+
+std::function<void()>* mkcollect(sol::BaseValue* val, std::function<void()> fn) {
+    return new std::function([val,fn](){
+        sol::gc::gc_m.lock();
+        fn();
+        std::size_t i = 0;
+        while (i < sol::gc::all.size()) {
+            if (sol::gc::all[i] == val) break;
+            i++;
+        }
+        sol::gc::all.erase(sol::gc::all.begin() + i);
+        i = 0;
+        bool persistent = false;
+        while (i < sol::gc::persistent.size()) {
+            if (sol::gc::persistent[i] == val) {
+                persistent = true;
+                break;
+            }
+            i++;
+        }
+        if (persistent) sol::gc::persistent.erase(sol::gc::persistent.begin() + i);
+        auto it = sol::gc::refs.find(val);
+        sol::gc::refs.erase(it);
+        SOL_MUNLOCK(sol::gc::gc_m)
+    });
+}
+
 bool sol::vec8Compare(vec8 v1, vec8 v2) {
     if (v1.size() != v2.size()) return false;
     for (std::size_t i = 0; i < v1.size(); i++) {
@@ -251,45 +290,6 @@ std::string sol::vec8ToStdString(vec8 v) {
         result.push_back(i);
     }
     return result;
-}
-
-std::function<void()>* mkcollect(sol::BaseValue* val, std::function<void()> fn) {
-    return new std::function([val,fn](){
-        sol::gc::gc_m.lock();
-        fn();
-        std::size_t i = 0;
-        while (i < sol::gc::all.size()) {
-            if (sol::gc::all[i] == val) break;
-            i++;
-        }
-        sol::gc::all.erase(sol::gc::all.begin() + i);
-        i = 0;
-        bool persistent = false;
-        while (i < sol::gc::persistent.size()) {
-            if (sol::gc::persistent[i] == val) {
-                persistent = true;
-                break;
-            }
-            i++;
-        }
-        if (persistent) sol::gc::persistent.erase(sol::gc::persistent.begin() + i);
-        auto it = sol::gc::refs.find(val);
-        sol::gc::refs.erase(it);
-        SOL_MUNLOCK(sol::gc::gc_m)
-    });
-}
-
-std::function<sol::Value()> mknew(std::function<sol::BaseValue*()> fn) {
-    return [fn](){
-        sol::gc::gc_m.lock();
-        sol::BaseValue* val = fn();
-        sol::Value res;
-        res._ = val;
-        sol::gc::all.push_back(val);
-        sol::gc::persistent.push_back(val);
-        sol::gc::refs[val] = std::vector<void*>();
-        SOL_MUNLOCKRET(sol::gc::gc_m, res)
-    };
 }
 
 sol::Value sol::Value::NewUndefined() {
