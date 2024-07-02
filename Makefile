@@ -22,7 +22,18 @@
 #	OS_TARGET := macos_all
 #endif
 
+all:
+	$(MAKE) deps
+	$(MAKE) sol
+
+sol:
+	mkdir -p out/sol
+	$(CXX) -c engines/sol/sol-base.cpp -I engines -I engines/sol -I out/gmp -o out/sol/sol-base.o
+
 deps:
+	$(MAKE) gmp
+
+gmp:
 	mkdir -p out/gmp
 	cd out/gmp ; ../../libs/gmp/configure
 	$(MAKE) -C out/gmp
